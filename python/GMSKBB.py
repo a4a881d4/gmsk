@@ -14,7 +14,10 @@ class GMSKBB:
 	
 	def newD(self):
 		return self.over
-				
+	
+	def report(self):
+		print "#",len(self.State),self.HState,self.over,self.State[0],self.AS
+					
 	def ce( self,inS ):
 		if self.over==1:
 			self.over=0
@@ -27,16 +30,17 @@ class GMSKBB:
 				self.State.append(1)
 			else:
 				self.State.append(-1)
-		
+				
 		ret = constants.GMSKP*(self.HState+4)
 		for T in range(-constants.GMSKRange,constants.GMSKRange):
 			t = T + constants.GMSKRange
-			ret = ret + self.Table[t*constants.GMSKOSCF+self.AS]*self.State[t]
+			ret = ret + self.Table[t*constants.GMSKOSCF+self.AS]*self.State[-t]
 				
 		self.AS = self.AS + self.Acc
 		if self.AS>=constants.GMSKOSCF:
 			self.over=1
 		self.AS = self.AS%constants.GMSKOSCF		
+		self.report()
 		
 		return ret%(4*constants.GMSKP)
 		
