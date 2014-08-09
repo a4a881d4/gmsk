@@ -1,4 +1,6 @@
 import constants
+import math
+
 class POSC:
 	def __init__(self,f,Fs):
 		self.f = f
@@ -15,10 +17,14 @@ class POSC:
 		ret = []
 		for i in range(0,constants.OverSampleRate):
 			self.State[i] = ( self.State[i] + self.AccHigh ) % constants.HighOSCF
+			"""
 			if (( self.State[i] + inS ) % constants.HighOSCF) >= constants.HighOSCF/2:
 				ret.append(-1)
 			else:
 				ret.append(1)
+			"""
+			p = ( self.State[i] + inS )/float(constants.HighOSCF)*2.*math.pi
+			ret.append(math.sin(p))
 		return ret
 		
 	def report(self):
