@@ -20,16 +20,19 @@ class spectrum:
 			self.frame = self.frame + 1
 	
 	def normalize(self,p):
-		ret = p//self.frame/self.N
+		ret = p/self.frame/self.N
 		return ret.real
 				
 	def out(self):
-		ret = [ 0. for i in range(self.N/2+1) ]
-		for i in range(len(ret)):
-			if i==0:
-				a = self.normalize(self.pxx[i])
-			else:
-				a = self.normalize(self.pxx[i]+self.pxx[self.N-i])
-			ret[i] = 10.*math.log(a+1e-30,10)
-		return ret
+		if self.frame==0:
+			return []
+		else:
+			ret = [ 0. for i in range(self.N/2+1) ]
+			for i in range(len(ret)):
+				if i==0:
+					a = self.normalize(self.pxx[i])
+				else:
+					a = self.normalize(self.pxx[i]+self.pxx[self.N-i])
+				ret[i] = a #10.*math.log(a+1e-30,10)
+			return ret
 		 

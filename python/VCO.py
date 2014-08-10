@@ -38,23 +38,25 @@ class VCO:
 			r = self.center-1
 		return r
 		
-		
+	def center(self):
+		return self.center
+			
 if __name__=='__main__':
-	f = 360e6
-	Fs = 6144e6
+	f = 350e6
+	Fs = 6400e6
 	W = 24
 	aVCO = VCO(f,Fs,W)
-	V = 18
-	odd = 0
+	V = aVCO.center
+	
 	s0 = 0
 	s1 = 0
-	aPxx = spectrum.spectrum(61440)
+	aPxx = spectrum.spectrum(64000)
 	for T in range(0,100000):
 		state = aVCO.ce(V,0)
 		s0 = s0 + state
-		s1 = s1 + s0
+		#s1 = s1 + s0
 		V = aVCO.judge(state+s0*0.75+s1/8)
-		# print "#",state,V
+		#print "#",state,V
 		o = aVCO.output(V)
 		for i in range(0,len(o)):
 			aPxx.push(o[i])
