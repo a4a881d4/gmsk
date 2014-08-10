@@ -1,3 +1,5 @@
+import spectrum
+
 class VCO:
 	def __init__(self,f,Fs,W):
 		self.Full = 1<<W
@@ -38,19 +40,28 @@ class VCO:
 		
 		
 if __name__=='__main__':
-	f = 350e6
+	f = 360e6
 	Fs = 6144e6
 	W = 24
 	aVCO = VCO(f,Fs,W)
 	V = 18
 	odd = 0
 	s0 = 0
+	s1 = 0
+	aPxx = spectrum.spectrum(61440)
 	for T in range(0,100000):
 		state = aVCO.ce(V,0)
-		s0 = (1-1/128.)*s0 + state
-		V = aVCO.judge(s0)
+		s0 = s0 + state
+		s1 = s1 + s0
+		V = aVCO.judge(state+s0*0.75+s1/8)
 		# print "#",state,V
 		o = aVCO.output(V)
 		for i in range(0,len(o)):
-			print o[i]
+			aPxx.push(o[i])
+	pxx = aPxx.out()
+	sum = 0
+	for i in range(len(pxx)):
+		print i,pxx[i]
+		sum = sum + pxx[i]
+	print "sum = ",sum
 					
