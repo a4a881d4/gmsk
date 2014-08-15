@@ -1,4 +1,4 @@
-Shift = 5
+Shift = 4
 OverSampleRate = 1<<Shift
 HighOSCWidth = 12
 HighOSCF = 1<<HighOSCWidth
