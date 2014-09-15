@@ -2,7 +2,6 @@ import constants
 import POSC
 import OSC
 import GMSKBB
-import random
 
 class GMSK:
 	def __init__(self,gmskR,carrierF,Fs):
@@ -23,17 +22,27 @@ class GMSK:
 		phase = phase & self.mask
 		ret = self.posc.ce(phase)
 		return ret
+import spectrum
+from pylab import *
+import random
 		
 if __name__=='__main__':
-	tut = GMSK(5e6,340e6,6144e6)
-	data = []
-	for i in range(0,11520):
-		d = random.randint(0,1)
-		data.append(d)
-	while data:
-		ret = tut.ce(data)
-		for i in range(0,len(ret)):
-			print ret[i]
-			
-			
+	for f in range(15):
+	
+		tut = GMSK(16e6,4500e6+40e6/3.*f,12800e6)
+	
+		data = []
+		aPxx = spectrum.spectrum(12800)
+	
+		for i in range(0,11520):
+			d = random.randint(0,1)
+			data.append(d)
+		while data:
+			ret = tut.ce(data)
+			for i in range(0,len(ret)):
+				aPxx.push(ret[i])
+		print "*"
+		pxx = aPxx.out()	
+		plot(10./log(10.)*log(pxx))
+	show()		
 		

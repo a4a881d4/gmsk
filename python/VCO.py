@@ -40,9 +40,8 @@ class VCO:
 		
 	def center(self):
 		return self.center
-			
-if __name__=='__main__':
-	f = 350e6
+	
+def aTest(f):
 	Fs = 6400e6
 	W = 24
 	aVCO = VCO(f,Fs,W)
@@ -61,9 +60,17 @@ if __name__=='__main__':
 		for i in range(0,len(o)):
 			aPxx.push(o[i])
 	pxx = aPxx.out()
-	sum = 0
-	for i in range(len(pxx)):
-		print i,pxx[i]
-		sum = sum + pxx[i]
-	print "sum = ",sum
+	return pxx
+		
+from pylab import *
+	
+if __name__=='__main__':
+	fs = [345e6,346e6,347e6,348e6,349e6]
+	
+	for f in range(20):
+	    
+	    pxx = aTest(f*1e6+340e6)
+	    plot(10./log(10.)*log(pxx))
+	show()
+	    
 					
