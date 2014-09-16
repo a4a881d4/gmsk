@@ -26,6 +26,7 @@ from matplotlib.pylab import *
 import spectrum
 import random
 import nrfChan	
+import nrf24l01rx
 
 if __name__ == '__main__':
 	aTx = Tx(32,1<<16,0.32)
@@ -33,9 +34,12 @@ if __name__ == '__main__':
 	bPxx = spectrum.spectrum(1024)
 	
 	
-	aCh = nrfChan.nrf24l01Channel(0.2) # Eb/N0=7dB 
+	aCh = nrfChan.nrf24l01Channel(0.02) # Eb/N0=7dB
+	
+	aRx = nrf24l01rx.nrf24l01rx(32)
+	
 	data = []
-	for i in range(0,10240):
+	for i in range(0,1024):
 		d = random.randint(0,1)
 		data.append(d)
 	r = aTx.modu(data)
@@ -48,16 +52,17 @@ if __name__ == '__main__':
 		p = p + phase
 		s = complex(math.cos(2.*p*math.pi/(1<<16)),math.sin(2.*p*math.pi/(1<<16)))
 		cs = aCh.ce(s)
-		aPxx.push(s)
-		bPxx.push(cs)
-		c.append(cs)
+		rx = aRx.ce(cs)
+		#aPxx.push(s)
+		#bPxx.push(cs)
+		c.append(rx)
 		
 		
 	apxx = aPxx.out()
 	bpxx = bPxx.out()
 
-	plot(10./log(10.)*log(apxx))
-	plot(10./log(10.)*log(bpxx))
-	show()
+	#plot(10./log(10.)*log(apxx))
+	#plot(10./log(10.)*log(bpxx))
+	#show()
 
 	
