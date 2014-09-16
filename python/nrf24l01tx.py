@@ -4,7 +4,6 @@ import math
 class Tx:
 	def __init__(self,OS,W,h):
 		self.table = Qfunc.Fserial(0.5,OS,1,float(W/2)*h) # W->pi
-		print len(self.table)
 		self.os = OS
 		self.w = W
 		self.h = h
@@ -26,30 +25,39 @@ class Tx:
 from matplotlib.pylab import *
 import spectrum
 import random
-	
+import nrfChan	
+
 if __name__ == '__main__':
 	aTx = Tx(32,1<<16,0.32)
 	aPxx = spectrum.spectrum(1024)
-
+	bPxx = spectrum.spectrum(1024)
+	
+	
+	aCh = nrfChan.nrf24l01Channel(0.2) # Eb/N0=7dB 
 	data = []
-	for i in range(0,3840):
+	for i in range(0,10240):
 		d = random.randint(0,1)
 		data.append(d)
 	r = aTx.modu(data)
-	x = []
-	y = []
+	c = []
+	
 	phase = 0
 	for p in r:
-		phase = phase + (1<<13)
-		phase = phase % (1<<16)
+		#phase = phase + (1<<13)
+		#phase = phase % (1<<16)
 		p = p + phase
-		x.append(math.cos(2.*p*math.pi/(1<<16)))
-		y.append(math.sin(2.*p*math.pi/(1<<16)))
-		aPxx.push(math.cos(2.*p*math.pi/(1<<16)))
+		s = complex(math.cos(2.*p*math.pi/(1<<16)),math.sin(2.*p*math.pi/(1<<16)))
+		cs = aCh.ce(s)
+		aPxx.push(s)
+		bPxx.push(cs)
+		c.append(cs)
 		
-	pxx = aPxx.out()
+		
+	apxx = aPxx.out()
+	bpxx = bPxx.out()
 
-	plot(10./log(10.)*log(pxx))
+	plot(10./log(10.)*log(apxx))
+	plot(10./log(10.)*log(bpxx))
 	show()
 
 	
