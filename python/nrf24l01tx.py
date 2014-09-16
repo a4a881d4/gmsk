@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	bPxx = spectrum.spectrum(1024)
 	
 	
-	aCh = nrfChan.nrf24l01Channel(0.02) # Eb/N0=7dB
+	aCh = nrfChan.nrf24l01Channel(0.002) # Eb/N0=27dB
 	
 	aRx = nrf24l01rx.nrf24l01rx(32)
 	
@@ -58,11 +58,23 @@ if __name__ == '__main__':
 		c.append(rx)
 		
 		
-	apxx = aPxx.out()
-	bpxx = bPxx.out()
+	#apxx = aPxx.out()
+	#bpxx = bPxx.out()
 
 	#plot(10./log(10.)*log(apxx))
 	#plot(10./log(10.)*log(bpxx))
 	#show()
+	
+	e = [0 for i in range(96)]
+	for d in data:
+		for i in range(32):
+			e.append((1-2*d)*0.01)
+			
+	plot(e)
+	plot(c)
+	
+	show()
+	grid('on')
+	
 
 	
