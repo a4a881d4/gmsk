@@ -33,7 +33,7 @@ import pilot
 if __name__ == '__main__':
 	aTx = Tx(32,1<<16,0.32)
 	
-	aCh = nrfChan.nrf24l01Channel(0.005) # Eb/N0=27dB
+	aCh = nrfChan.nrf24l01Channel(0.2) # Eb/N0=27dB
 	
 	aRx = nrf24l01rx.nrf24l01rx(32)
 	
