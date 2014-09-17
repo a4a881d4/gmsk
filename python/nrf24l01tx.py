@@ -27,54 +27,59 @@ import spectrum
 import random
 import nrfChan	
 import nrf24l01rx
+import sync
+import pilot
 
 if __name__ == '__main__':
 	aTx = Tx(32,1<<16,0.32)
-	aPxx = spectrum.spectrum(1024)
-	bPxx = spectrum.spectrum(1024)
 	
-	
-	aCh = nrfChan.nrf24l01Channel(0.002) # Eb/N0=27dB
+	aCh = nrfChan.nrf24l01Channel(0.005) # Eb/N0=27dB
 	
 	aRx = nrf24l01rx.nrf24l01rx(32)
 	
-	data = []
-	for i in range(0,1024):
-		d = random.randint(0,1)
-		data.append(d)
-	r = aTx.modu(data)
-	c = []
-	
-	phase = 0
-	for p in r:
-		#phase = phase + (1<<13)
-		#phase = phase % (1<<16)
-		p = p + phase
-		s = complex(math.cos(2.*p*math.pi/(1<<16)),math.sin(2.*p*math.pi/(1<<16)))
-		cs = aCh.ce(s)
-		rx = aRx.ce(cs)
-		#aPxx.push(s)
-		#bPxx.push(cs)
-		c.append(rx)
-		
-		
-	#apxx = aPxx.out()
-	#bpxx = bPxx.out()
-
-	#plot(10./log(10.)*log(apxx))
-	#plot(10./log(10.)*log(bpxx))
-	#show()
-	
-	e = [0 for i in range(96)]
-	for d in data:
-		for i in range(32):
-			e.append((1-2*d)*0.01)
+	for frame in range(100):
+		data = pilot.pilot(1)
+		for i in range(0,256):
+			d = random.randint(0,1)
+			data.append(d)
 			
-	plot(e)
-	plot(c)
+		data.append(0)
+		data.append(1)
+		data.append(0)
+		
+		r = aTx.modu(data)
+		c = []
+		
+		phase = 0
+		for p in r:
+			p = p + phase
+			s = complex(math.cos(2.*p*math.pi/(1<<16)),math.sin(2.*p*math.pi/(1<<16)))
+			cs = aCh.ce(s)
+			rx = aRx.ce(cs)
+			c.append(rx)
+			
+		
+		pos = sync.sync(c[0:32*60]) % 32 + 96
+		
+		rec = []
+		while 1:
+			cd = c[pos]
+			if cd<0:
+				rec.append(1)
+			else:
+				rec.append(0)
+			pos = pos + 32
+			if pos>=len(c):
+				break
+		
+		error = 0
+		for i in range(256):
+			if data[i+40]!=rec[i+40]:
+				error = error + 1
+		print 'fn=',frame,' err=',error
+			
 	
-	show()
-	grid('on')
+	
 	
 
 	
