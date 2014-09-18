@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	
 	aTx = Tx(32,1<<16,0.32)
 	
-	aCh = nrfChan.nrf24l01Channel(0.5) # Eb/N0=27dB
+	aCh = nrfChan.nrf24l01Channel(1) # Eb/N0=27dB
 	
 	aRx = nrf24l01rx.nrf24l01rx(2)
 	
@@ -53,6 +53,7 @@ if __name__ == '__main__':
 		
 		r = aTx.modu(data)
 		c = []
+		d = []
 		
 		phase = 0
 		k = 1
@@ -65,14 +66,15 @@ if __name__ == '__main__':
 				k = 0
 				rx = aRx.ce(cs)
 				c.append(rx)
+				d.append(cs)
 			k = k + 1
 			
 		
 		( pos, ret ) = sync.sync(c[0:2*60],2)
+		( pos2, ret2, aret ) = sync.syncBeforeDemod(d[0:2*60],2,0.32)
+		print pos,"  ",pos2
 		
-		print pos
-		
-		pos = pos - 2*40
+		pos = pos2 - 2*40 - 3
 		
 		rec = []
 		for i in range(256+40):
