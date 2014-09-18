@@ -31,13 +31,17 @@ import sync
 import pilot
 
 if __name__ == '__main__':
+	
+	Frames = 100
+	errorA = 0
+	
 	aTx = Tx(32,1<<16,0.32)
 	
-	aCh = nrfChan.nrf24l01Channel(0.2) # Eb/N0=27dB
+	aCh = nrfChan.nrf24l01Channel(0.5) # Eb/N0=27dB
 	
-	aRx = nrf24l01rx.nrf24l01rx(32)
+	aRx = nrf24l01rx.nrf24l01rx(2)
 	
-	for frame in range(100):
+	for frame in range(Frames):
 		data = pilot.pilot(1)
 		for i in range(0,256):
 			d = random.randint(0,1)
@@ -51,32 +55,43 @@ if __name__ == '__main__':
 		c = []
 		
 		phase = 0
+		k = 1
 		for p in r:
 			p = p + phase
+			phase = phase + 0
 			s = complex(math.cos(2.*p*math.pi/(1<<16)),math.sin(2.*p*math.pi/(1<<16)))
 			cs = aCh.ce(s)
-			rx = aRx.ce(cs)
-			c.append(rx)
+			if k==16:
+				k = 0
+				rx = aRx.ce(cs)
+				c.append(rx)
+			k = k + 1
 			
 		
-		pos = sync.sync(c[0:32*60]) % 32 + 96
+		( pos, ret ) = sync.sync(c[0:2*60],2)
+		
+		print pos
+		
+		pos = pos - 2*40
 		
 		rec = []
-		while 1:
+		for i in range(256+40):
 			cd = c[pos]
 			if cd<0:
 				rec.append(1)
 			else:
 				rec.append(0)
-			pos = pos + 32
-			if pos>=len(c):
-				break
-		
+			pos = (pos + 2) % len(c)
+			
 		error = 0
 		for i in range(256):
 			if data[i+40]!=rec[i+40]:
 				error = error + 1
 		print 'fn=',frame,' err=',error
+		errorA = errorA + error
+		
+	print "Error Rate = ",float(errorA)/Frames/256
+	
 			
 	
 	
